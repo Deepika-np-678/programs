@@ -1,0 +1,641 @@
+class Solution(object):
+    def twoSum(self, nums, target):
+        """
+        :type nums: List[int]
+        :type target: int
+        :rtype: List[int]
+        """
+        seen = {}
+        for i, num in enumerate(nums):
+            complement = target - num
+            if complement in seen:
+                return [seen[complement], i]
+            seen[num] = i
+
+# Example usage:
+nums1 = [2, 7, 11, 15]
+target1 = 9
+nums2 = [3, 2, 4]
+target2 = 6
+nums3 = [3, 3]
+target3 = 6
+
+sol = Solution()
+print(sol.twoSum(nums1, target1))  # Output: [0, 1]
+print(sol.twoSum(nums2, target2))  # Output: [1, 2]
+print(sol.twoSum(nums3, target3))  # Output: [0, 1]
+
+# Definition for singly-linked list.
+# class ListNode(object):
+#     def __init__(self, val=0, next=None):
+#         self.val = val
+#         self.next = next
+class Solution(object):
+    def addTwoNumbers(self, l1, l2):
+        """
+        :type l1: Optional[ListNode]
+        :type l2: Optional[ListNode]
+        :rtype: Optional[ListNode]
+        """
+        dummy = ListNode(0)
+        current = dummy
+        carry = 0
+
+        while l1 or l2 or carry:
+            val1 = l1.val if l1 else 0
+            val2 = l2.val if l2 else 0
+            total = val1 + val2 + carry
+
+            carry = total // 10
+            current.next = ListNode(total % 10)
+            current = current.next
+
+            if l1: l1 = l1.next
+            if l2: l2 = l2.next
+
+        return dummy.next
+
+# Example usage:
+# Assuming ListNode class is defined
+# def list_to_linked_list(items):
+#     dummy = ListNode(0)
+#     current = dummy
+#     for item in items:
+#         current.next = ListNode(item)
+#         current = current.next
+#     return dummy.next
+
+# def linked_list_to_list(node):
+#     result = []
+#     while node:
+#         result.append(node.val)
+#         node = node.next
+#     return result
+
+# l1 = list_to_linked_list([2, 4, 3])
+# l2 = list_to_linked_list([5, 6, 4])
+# sol = Solution()
+# result = sol.addTwoNumbers(l1, l2)
+# print(linked_list_to_list(result))  # Output: [7, 0, 8]
+
+class Solution(object): 
+    def lengthOfLongestSubstring(self, s):
+        """
+        :type s: str
+        :rtype: int
+        """
+        char_set = set()
+        left = 0
+        max_length = 0
+
+        for right in range(len(s)):
+            while s[right] in char_set:
+                char_set.remove(s[left])
+                left += 1
+            char_set.add(s[right])
+            max_length = max(max_length, right - left + 1)
+
+        return max_length
+
+# Example usage:
+sol = Solution()
+print(sol.lengthOfLongestSubstring("abcabcbb"))  # Output: 3
+print(sol.lengthOfLongestSubstring("bbbbb"))    # Output: 1
+print(sol.lengthOfLongestSubstring("pwwkew"))   # Output: 3
+
+class Solution(object): 
+    def findMedianSortedArrays(self, nums1, nums2):
+        """
+        :type nums1: List[int]
+        :type nums2: List[int]
+        :rtype: float
+        """
+        # Ensure nums1 is the smaller array
+        if len(nums1) > len(nums2):
+            nums1, nums2 = nums2, nums1
+
+        x, y = len(nums1), len(nums2)
+        low, high = 0, x
+
+        while low <= high:
+            partitionX = (low + high) // 2
+            partitionY = (x + y + 1) // 2 - partitionX
+
+            maxX = float('-inf') if partitionX == 0 else nums1[partitionX - 1]
+            minX = float('inf') if partitionX == x else nums1[partitionX]
+
+            maxY = float('-inf') if partitionY == 0 else nums2[partitionY - 1]
+            minY = float('inf') if partitionY == y else nums2[partitionY]
+
+            if maxX <= minY and maxY <= minX:
+                if (x + y) % 2 == 0:
+                    return (max(maxX, maxY) + min(minX, minY)) / 2.0
+                else:
+                    return max(maxX, maxY)
+            elif maxX > minY:
+                high = partitionX - 1
+            else:
+                low = partitionX + 1
+
+        raise ValueError("Input arrays are not sorted")
+
+# Example usage:
+sol = Solution()
+print(sol.findMedianSortedArrays([1, 3], [2]))  # Output: 2.0
+print(sol.findMedianSortedArrays([1, 2], [3, 4]))  # Output: 2.5
+
+class Solution(object):
+    def longestPalindrome(self, s):
+        """
+        :type s: str
+        :rtype: str
+        """
+        if not s:
+            return ""
+        
+        def expand_around_center(left, right):
+            while left >= 0 and right < len(s) and s[left] == s[right]:
+                left -= 1
+                right += 1
+            return s[left + 1:right]
+        
+        longest = ""
+        for i in range(len(s)):
+            # Check for odd-length palindromes (single character center)
+            odd_palindrome = expand_around_center(i, i)
+            # Check for even-length palindromes (between two characters)
+            even_palindrome = expand_around_center(i, i + 1)
+            
+            # Update longest palindrome if a longer one is found
+            if len(odd_palindrome) > len(longest):
+                longest = odd_palindrome
+            if len(even_palindrome) > len(longest):
+                longest = even_palindrome
+        
+        return longest
+
+class Solution(object):
+    def convert(self, s, numRows):
+        """
+        :type s: str
+        :type numRows: int
+        :rtype: str
+        """
+        if numRows == 1 or numRows >= len(s):
+            return s
+        
+        # Initialize an array of empty strings for each row
+        rows = [''] * numRows
+        current_row = 0
+        going_down = False
+        
+        for char in s:
+            # Add the character to the current row
+            rows[current_row] += char
+            
+            # Determine whether we need to go down or up in the zigzag
+            if current_row == 0 or current_row == numRows - 1:
+                going_down = not going_down
+                
+            # Move to the next row depending on the direction
+            current_row += 1 if going_down else -1
+        
+        # Join all rows into a single string and return the result
+        return ''.join(rows)
+
+
+class Solution(object):
+    def reverse(self, x):
+        """
+        :type x: int
+        :rtype: int
+        """
+        # Define the 32-bit integer range
+        INT_MIN = -2**31
+        INT_MAX = 2**31 - 1
+        
+        # Check if the number is negative and store the sign
+        sign = -1 if x < 0 else 1
+        x = abs(x)
+        
+        # Reverse the digits of the absolute value of x
+        reversed_x = 0
+        while x != 0:
+            digit = x % 10
+            reversed_x = reversed_x * 10 + digit
+            x //= 10
+        
+        # Restore the sign
+        reversed_x *= sign
+        
+        # Check if the reversed number is within the 32-bit integer range
+        if reversed_x < INT_MIN or reversed_x > INT_MAX:
+            return 0
+        
+        return reversed_x
+
+class Solution(object):
+    def myAtoi(self, s):
+        """
+        :type s: str
+        :rtype: int
+        """
+        # Define the 32-bit integer range
+        INT_MIN = -2**31
+        INT_MAX = 2**31 - 1
+        
+        # Step 1: Strip leading whitespaces
+        s = s.lstrip()
+
+        # Step 2: Check for sign
+        sign = 1  # Default is positive
+        if len(s) > 0 and s[0] == '-':
+            sign = -1
+            s = s[1:]
+        elif len(s) > 0 and s[0] == '+':
+            s = s[1:]
+
+        # Step 3: Convert digits
+        result = 0
+        for char in s:
+            if not char.isdigit():
+                break
+            result = result * 10 + int(char)
+
+        # Apply the sign
+        result *= sign
+
+        # Step 4: Handle overflow and underflow
+        if result < INT_MIN:
+            return INT_MIN
+        if result > INT_MAX:
+            return INT_MAX
+
+        return result
+
+
+class Solution(object):
+    def isPalindrome(self, x):
+        """
+        :type x: int
+        :rtype: bool
+        """
+        # Step 1: Negative numbers are not palindromes
+        if x < 0:
+            return False
+        
+        # Step 2: Convert the integer to a string and check if it equals its reverse
+        str_x = str(x)
+        return str_x == str_x[::-1]
+
+class Solution(object):
+    def isMatch(self, s, p):
+        """
+        :type s: str
+        :type p: str
+        :rtype: bool
+        """
+        # Initialize the dp table
+        dp = [[False] * (len(p) + 1) for _ in range(len(s) + 1)]
+        
+        # Base case: empty pattern matches empty string
+        dp[0][0] = True
+        
+        # Handle the case where the pattern contains '*' (matches zero occurrence)
+        for j in range(1, len(p) + 1):
+            if p[j - 1] == '*':
+                dp[0][j] = dp[0][j - 2]
+        
+        # Fill the dp table
+        for i in range(1, len(s) + 1):
+            for j in range(1, len(p) + 1):
+                if p[j - 1] == s[i - 1] or p[j - 1] == '.':
+                    # Case 1: Match the current character
+                    dp[i][j] = dp[i - 1][j - 1]
+                elif p[j - 1] == '*':
+                    # Case 2: '*' can match zero or more of the preceding character
+                    dp[i][j] = dp[i][j - 2]  # Match zero occurrence of the preceding element
+                    if p[j - 2] == s[i - 1] or p[j - 2] == '.':
+                        dp[i][j] = dp[i][j] or dp[i - 1][j]  # Match one or more occurrences
+        
+        return dp[len(s)][len(p)]
+
+class Solution(object):
+    def maxArea(self, height):
+        """
+        :type height: List[int]
+        :rtype: int
+        """
+        left = 0
+        right = len(height) - 1
+        max_area = 0
+        
+        while left < right:
+            # Calculate the area between the lines at left and right
+            current_area = min(height[left], height[right]) * (right - left)
+            max_area = max(max_area, current_area)
+            
+            # Move the pointer of the shorter line inward
+            if height[left] < height[right]:
+                left += 1
+            else:
+                right -= 1
+        
+        return max_area
+
+class Solution(object):
+    def intToRoman(self, num):
+        """
+        :type num: int
+        :rtype: str
+        """
+        # List of Roman numerals corresponding to place values
+        roman_numerals = [
+            (1000, 'M'),
+            (900, 'CM'),
+            (500, 'D'),
+            (400, 'CD'),
+            (100, 'C'),
+            (90, 'XC'),
+            (50, 'L'),
+            (40, 'XL'),
+            (10, 'X'),
+            (9, 'IX'),
+            (5, 'V'),
+            (4, 'IV'),
+            (1, 'I')
+        ]
+        
+        # Result string
+        result = ""
+        
+        # Convert num to Roman numeral
+        for value, symbol in roman_numerals:
+            # While num is greater than or equal to value, append the symbol
+            while num >= value:
+                result += symbol
+                num -= value
+        
+        return result
+
+class Solution(object):
+    def romanToInt(self, s):
+        """
+        :type s: str
+        :rtype: int
+        """
+        # Mapping Roman numerals to their corresponding integer values
+        roman_map = {
+            'I': 1,
+            'V': 5,
+            'X': 10,
+            'L': 50,
+            'C': 100,
+            'D': 500,
+            'M': 1000
+        }
+        
+        # Initialize total to 0
+        total = 0
+        
+        # Iterate through the string s
+        for i in range(len(s) - 1):
+            # If current value is smaller than the next value, subtract it
+            if roman_map[s[i]] < roman_map[s[i + 1]]:
+                total -= roman_map[s[i]]
+            else:
+                total += roman_map[s[i]]
+        
+        # Add the value of the last character
+        total += roman_map[s[-1]]
+        
+        return total
+
+class Solution(object):
+    def longestCommonPrefix(self, strs):
+        """
+        :type strs: List[str]
+        :rtype: str
+        """
+        # Edge case: If the input list is empty, return an empty string
+        if not strs:
+            return ""
+        
+        # Start by assuming the first string is the longest common prefix
+        prefix = strs[0]
+        
+        # Iterate through each string in the list
+        for string in strs[1:]:
+            # Compare the current prefix with each string
+            # Update the prefix by finding the common prefix between prefix and string
+            while not string.startswith(prefix):
+                # Shorten the prefix by one character from the end
+                prefix = prefix[:-1]
+                # If at any point the prefix becomes empty, return ""
+                if not prefix:
+                    return ""
+        
+        # Return the longest common prefix found
+        return prefix
+
+class Solution(object):
+    def threeSum(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: List[List[int]]
+        """
+        # Sort the array to facilitate two-pointer approach
+        nums.sort()
+        result = []
+        
+        # Iterate through the sorted array
+        for i in range(len(nums) - 2):
+            # Skip the same element to avoid duplicates in the result
+            if i > 0 and nums[i] == nums[i - 1]:
+                continue
+            
+            # Use two pointers to find pairs that sum to -nums[i]
+            left, right = i + 1, len(nums) - 1
+            while left < right:
+                total = nums[i] + nums[left] + nums[right]
+                
+                if total < 0:
+                    # If the sum is too small, move the left pointer to the right
+                    left += 1
+                elif total > 0:
+                    # If the sum is too large, move the right pointer to the left
+                    right -= 1
+                else:
+                    # If the sum is zero, we found a valid triplet
+                    result.append([nums[i], nums[left], nums[right]])
+                    
+                    # Skip duplicates for the left pointer
+                    while left < right and nums[left] == nums[left + 1]:
+                        left += 1
+                    
+                    # Skip duplicates for the right pointer
+                    while left < right and nums[right] == nums[right - 1]:
+                        right -= 1
+                    
+                    # Move both pointers inward
+                    left += 1
+                    right -= 1
+        
+        return result
+
+class Solution(object):
+    def threeSumClosest(self, nums, target):
+        """
+        :type nums: List[int]
+        :type target: int
+        :rtype: int
+        """
+        # Sort the array first
+        nums.sort()
+        
+        # Initialize the closest sum to a large number
+        closest_sum = float('inf')
+        
+        # Iterate through the array
+        for i in range(len(nums) - 2):
+            # Skip duplicates to avoid considering the same element for 'i'
+            if i > 0 and nums[i] == nums[i - 1]:
+                continue
+            
+            left, right = i + 1, len(nums) - 1
+            
+            while left < right:
+                current_sum = nums[i] + nums[left] + nums[right]
+                
+                # Check if we found a closer sum
+                if abs(current_sum - target) < abs(closest_sum - target):
+                    closest_sum = current_sum
+                
+                # If the current sum is less than the target, move the left pointer to the right
+                if current_sum < target:
+                    left += 1
+                # If the current sum is greater than the target, move the right pointer to the left
+                elif current_sum > target:
+                    right -= 1
+                # If the current sum is equal to the target, we can return it immediately
+                else:
+                    return current_sum
+        
+        return closest_sum
+
+class Solution(object):
+    def letterCombinations(self, digits):
+        """
+        :type digits: str
+        :rtype: List[str]
+        """
+        if not digits:
+            return []
+        
+        # Mapping from digits to corresponding letters
+        digit_to_letters = {
+            '2': 'abc', '3': 'def', '4': 'ghi', '5': 'jkl',
+            '6': 'mno', '7': 'pqrs', '8': 'tuv', '9': 'wxyz'
+        }
+        
+        result = []
+        
+        # Helper function to perform backtracking
+        def backtrack(index, current_combination):
+            # If the current combination is the same length as the digits, we add it to the result
+            if index == len(digits):
+                result.append("".join(current_combination))
+                return
+            
+            # Get the letters corresponding to the current digit
+            letters = digit_to_letters[digits[index]]
+            
+            # Loop through each letter and explore further
+            for letter in letters:
+                current_combination.append(letter)
+                backtrack(index + 1, current_combination)
+                current_combination.pop()  # Backtrack
+        
+        # Start backtracking from the first digit
+        backtrack(0, [])
+        
+        return result
+
+class Solution(object):
+    def fourSum(self, nums, target):
+        """
+        :type nums: List[int]
+        :type target: int
+        :rtype: List[List[int]]
+        """
+        # Sort the input array
+        nums.sort()
+        result = []
+        n = len(nums)
+
+        for i in range(n - 3):  # First index of the quadruplet
+            # Skip duplicates for the first index
+            if i > 0 and nums[i] == nums[i - 1]:
+                continue
+            
+            for j in range(i + 1, n - 2):  # Second index of the quadruplet
+                # Skip duplicates for the second index
+                if j > i + 1 and nums[j] == nums[j - 1]:
+                    continue
+                
+                # Use two pointers to find the remaining two elements
+                left, right = j + 1, n - 1
+                while left < right:
+                    total = nums[i] + nums[j] + nums[left] + nums[right]
+                    if total == target:
+                        result.append([nums[i], nums[j], nums[left], nums[right]])
+                        # Move both pointers to avoid duplicates
+                        while left < right and nums[left] == nums[left + 1]:
+                            left += 1
+                        while left < right and nums[right] == nums[right - 1]:
+                            right -= 1
+                        left += 1
+                        right -= 1
+                    elif total < target:
+                        left += 1  # We need a larger sum
+                    else:
+                        right -= 1  # We need a smaller sum
+
+        return result
+
+# Definition for singly-linked list.
+# class ListNode(object):
+#     def __init__(self, val=0, next=None):
+#         self.val = val
+#         self.next = next
+
+class Solution(object):
+    def removeNthFromEnd(self, head, n):
+        """
+        :type head: Optional[ListNode]
+        :type n: int
+        :rtype: Optional[ListNode]
+        """
+        # Create a dummy node that points to the head of the list
+        dummy = ListNode(0)
+        dummy.next = head
+        
+        # Initialize two pointers
+        fast = slow = dummy
+        
+        # Move the fast pointer n steps ahead
+        for _ in range(n):
+            fast = fast.next
+        
+        # Move both fast and slow pointers until fast reaches the end
+        while fast.next:
+            fast = fast.next
+            slow = slow.next
+        
+        # Skip the nth node from the end
+        slow.next = slow.next.next
+        
+        # Return the new head (dummy.next points to the new head)
+        return dummy.next
+
+
